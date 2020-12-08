@@ -13,6 +13,7 @@ import ARKit
 // MARK: - SCNVector3 Extensions
 //------------------------------
 
+// vector distancing adjust based on https://github.com/NovatecConsulting/FaceRecognition-in-ARKit/blob/master/faceIT/SCNVector3%2BDistance.swift
 extension SCNVector3 {
     var length:Float {
         get {
@@ -50,6 +51,7 @@ extension SCNVector3 {
 // MARK: - ARSCNViewDelegate
 //--------------------------
 
+//ARSCNView Code based on https://stackoverflow.com/questions/51070395/distance-between-face-and-camera-using-arkit
 extension ViewController: ARSCNViewDelegate{
 
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {

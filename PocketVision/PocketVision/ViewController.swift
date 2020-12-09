@@ -85,6 +85,7 @@ extension ViewController: ARSCNViewDelegate{
             //5. Calculate The Average Distance Of The Eyes To The Camera
             let averageDistance = (leftEyeDistanceFromCamera.length + rightEyeDistanceFromCamera.length) / 2
             let averageDistanceCM = (Int(round(averageDistance * 100)))
+            self.distance = CGFloat(averageDistanceCM)
             self.distanceLabel.text = String(averageDistanceCM)
             print("Approximate Distance Of Face From Camera = \(averageDistanceCM)")
         }
@@ -97,11 +98,13 @@ class ViewController: UIViewController{
     @IBOutlet weak var distanceLabel: UILabel!
   //  @IBOutlet var sceneView:ARSCNView!
     @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var chartLabel: UILabel!
     
     var faceNode = SCNNode()
     var leftEye = SCNNode()
     var rightEye = SCNNode()
-
+    var updateTimer : Timer?;
+    var distance = CGFloat(25.0)
     //-----------------------
     // MARK: - View LifeCycle
     //-----------------------
@@ -115,11 +118,16 @@ class ViewController: UIViewController{
         let configuration = ARFaceTrackingConfiguration()
         configuration.isLightEstimationEnabled = true
         
-        sceneView.showsStatistics = true
+      //  sceneView.showsStatistics = true
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
         sceneView.delegate = self
         //2. Setup The Eye Nodes
         setupEyeNode()
+        
+        updateTimer = Timer.scheduledTimer(timeInterval: 0.2, target: self,
+            selector: #selector(self.updateDistanceLabel),
+            userInfo: nil,
+            repeats: true)
     }
     override func viewWillAppear(_ animated: Bool) { super.viewWillAppear(animated) }
 
@@ -142,6 +150,13 @@ class ViewController: UIViewController{
         leftEye = node.clone()
         rightEye = node.clone()
     }
-
+    
+    @objc
+    func updateDistanceLabel()
+    {
+        
+        chartLabel.font = .systemFont(ofSize: self.distance)
+        
+    }
 }
 

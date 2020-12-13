@@ -134,6 +134,8 @@ class ViewController: UIViewController{
     var choosedDirection:Int = 4
     let startAcuity = 2
     var acuity = 2
+    var currentDirection = 4
+    var lastResult = false
     //-----------------------
     // MARK: - View LifeCycle
     //-----------------------
@@ -172,23 +174,33 @@ class ViewController: UIViewController{
         
     }
     @IBAction func didSwipeLeft(_ sender: UISwipeGestureRecognizer) {
-        print("left")
+        if isTestStart{
+        print("swipe left")
         choosedDirection = 0
+        evaluateDirection(direction: choosedDirection)
+        }
     }
     
     @IBAction func didSwipeRight(_ sender: UISwipeGestureRecognizer) {
-        print("right")
+        if isTestStart{
+        print("swipe right")
         choosedDirection = 1
+        evaluateDirection(direction: choosedDirection)
+        }
     }
     
     @IBAction func didSwipeDown(_ sender: UISwipeGestureRecognizer) {
-        print("down")
+        if isTestStart{
+        print("swipe down")
         choosedDirection = 2
+            evaluateDirection(direction: choosedDirection)}
     }
     
     @IBAction func didSwipeUp(_ sender: UISwipeGestureRecognizer) {
-        print("up")
+        if isTestStart{
+        print("swipe up")
         choosedDirection = 3
+            evaluateDirection(direction: choosedDirection)}
     }
     
     @IBAction func leftPressed(_ sender: UIButton) {
@@ -206,9 +218,11 @@ class ViewController: UIViewController{
     @IBAction func startImagePressed(_ sender: UITapGestureRecognizer) {
         if (whichEye != "Unknown"){
            print("startPressed")
+            self.acuity = 2
            startView.isHidden = true
            self.isTestStart = true
-
+            self.isTestFinished = false
+            testRound(level: startAcuity)
         }else{
             print("should select which eye to test")}
     }
@@ -233,24 +247,51 @@ class ViewController: UIViewController{
         leftEye = node.clone()
         rightEye = node.clone()
     }
-
-    func eyeTest()->Int{
-        var temp = false
-        isTestFinished = true
-        return 0
+    
+    func evaluateDirection(direction:Int){
+        var result = (direction == self.currentDirection)
+        print (result)
+        if (lastResult != result) && (self.acuity != 2){
+            isTestFinished = true
+            print("result is: ",acuity)
+            endTest()
+            return
+        }
+        if acuity == 5 || acuity == 0 {
+            isTestFinished = true
+            print("result is: ",acuity)
+            endTest()
+            return
+        }
+        if result{
+            self.acuity+=1
+            testRound(level: acuity)
+        }else{
+            self.acuity-=1
+            testRound(level: acuity)
+        }
+        lastResult = result
     }
     
-    func testRound(level:Int)->Bool{
-        var result = false
+    func testRound(level:Int){
         let displayDirection = Int.random(in: 0...3)
+        self.currentDirection = displayDirection
+        print("current direction")
+        print(currentDirection)
         // ImageName = displayDirection+level
         //image =UIImage(named:ImageName)
-        
-        //wait for user response
-        
-        if displayDirection == choosedDirection{
-            result = true}
-        return result
+    }
+    
+    func endTest(){
+        isTestStart = false
+        let result = "Your "+whichEye+" eye acuity is "+String(acuity)
+        let ac = UIAlertController(title:"Result", message: result, preferredStyle: .alert)
+        let submitAction = UIAlertAction(title:"Confirm",style:.default){[unowned ac] _ in
+        }
+        ac.addAction(submitAction)
+        present(ac, animated: true)
+        whichEye = "Unknown"
+        startView.isHidden = false
     }
     
     @objc
